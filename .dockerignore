@@ -1,0 +1,13 @@
+.github/
+.git
+.gitignore
+
+dataset/
+
+Dockerfile
+.dockerignore
+
+LICENSE
+Pipfile.lock
+
+__pycache__
