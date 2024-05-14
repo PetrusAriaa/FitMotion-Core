@@ -9,11 +9,6 @@ model = keras.models.load_model('src/fitmotion_model.keras')
 
 WINDOW_LENGTH = 150
 STRIDE_LENGTH = 10
-NUM_CLASSES = 6
-NUM_FEATURES = 12
-BATCH_SIZE = 100
-EPOCHS_SIZE = 10
-
 LABELS = ['dws', 'jog', 'sit', 'std', 'ups', 'wlk']
 
 def sequence_generator(x, length, stride):
@@ -34,4 +29,4 @@ async def classify(b_file: bytes):
     y_pred = model.predict(feat)
     y_pred = argmax(y_pred, axis=1)
     y_pred = mode(y_pred)[0]
-    print(LABELS[y_pred])
+    return LABELS[y_pred]
