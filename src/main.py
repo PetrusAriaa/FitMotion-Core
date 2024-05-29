@@ -33,5 +33,5 @@ def ping():
 @app.post('/api/detect', tags=['Motion Detect'])
 async def detect_motion(file: UploadFile):
     b_file = await __validate_file(file)
-    result = await classify(b_file)
-    return {"result" : result}
+    result, proc_time = await classify(b_file)
+    return {"result" : result, "procTimeMS": proc_time}

@@ -7,9 +7,8 @@ name = "pypi"
 fastapi = "*"
 python-multipart = "*"
 numpy = "*"
-tensorflow = "*"
 pandas = "*"
-scipy = "*"
+onnxruntime = "*"
 
 [dev-packages]
 

@@ -9,5 +9,6 @@ Dockerfile
 
 LICENSE
 Pipfile.lock
+Pipfile
 
 __pycache__

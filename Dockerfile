@@ -1,20 +1,17 @@
 FROM python:3.10.12-slim
+
 WORKDIR /app
 
-COPY Pipfile .
+COPY requirements.txt .
 
-RUN \
-  apt update && \
-  pip install --upgrade pip && \
-  apt install pipenv -y && \
-  pipenv install -d && \
-  apt autoremove && apt autoclean
+RUN pip install -r requirements.txt
 
-ENV TF_ENABLE_ONEDNN_OPTS=0
+RUN pip install onnxruntime
+
 ENV TZ=Asia/Jakarta
 
 COPY . .
 
 EXPOSE 8080
 
-CMD ["pipenv", "run", "uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8080"]
+CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8080"]
