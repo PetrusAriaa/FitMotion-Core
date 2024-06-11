@@ -9,6 +9,9 @@ python-multipart = "*"
 numpy = "*"
 pandas = "*"
 onnxruntime = "*"
+sqlalchemy = "*"
+psycopg2-binary = "*"
+bcrypt = "*"
 
 [dev-packages]
 
