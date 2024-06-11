@@ -12,6 +12,7 @@ onnxruntime = "*"
 sqlalchemy = "*"
 psycopg2-binary = "*"
 bcrypt = "*"
+python-jose = "*"
 
 [dev-packages]
 
