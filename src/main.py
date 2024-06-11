@@ -6,7 +6,7 @@ app = FastAPI()
 
 @app.get('/health', tags=['Healthcheck'])
 def ping():
-    return {"message": "pong"}
+    return {"message": "hello"}
 
 app.include_router(prefix='/api/v1/predict', router=classifier_router)
 app.include_router(prefix='/api/v1/friends', router=friends_router)
