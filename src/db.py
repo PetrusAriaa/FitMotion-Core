@@ -5,7 +5,6 @@ from sqlalchemy.orm import sessionmaker
 from dotenv import load_dotenv
 
 if not os.getenv('SERVER_ENV') == 'production':
-    print(os.getenv('SERVER_ENV'))
     load_dotenv(".env.development")
 
 engine = create_engine(getenv("PG_URL"))
