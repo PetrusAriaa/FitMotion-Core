@@ -121,6 +121,7 @@ celerybeat.pid
 
 # Environments
 .env
+.env.development
 .venv
 env/
 venv/
@@ -161,3 +162,4 @@ cython_debug/
 
 # temporary
 dataset/
+
