@@ -1,2 +1,2 @@
 from .user import Users
-from .friends import Friends
+from .friends import Friends, FriendRequests
