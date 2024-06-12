@@ -1,2 +1,2 @@
-from .user import UserModel
-from .friends import FriendsModel
+from .user import Users
+from .friends import Friends
