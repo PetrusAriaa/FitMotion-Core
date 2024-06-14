@@ -8,8 +8,6 @@ RUN pip install -r requirements.txt
 
 RUN pip install onnxruntime
 
-ENV TZ=Asia/Jakarta
-
 COPY . .
 
 EXPOSE 8080

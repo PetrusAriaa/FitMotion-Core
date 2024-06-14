@@ -1,2 +1,4 @@
-from .user import UserResponse
+from .user import CreateUserRequest, CommonUserModel, \
+    CommonUserResponseModel, FriendRequestsModel, FriendRequestsResponseModel
 from .auth import TokenResponseModel
+from .statics import StaticGoalModel, StaticGoalResponseModel, StaticIllnessModel, StaticIllnessResponseModel

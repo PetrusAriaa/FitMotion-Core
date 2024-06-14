@@ -1,2 +1,3 @@
-from .user import UserModel
-from .friends import FriendsModel
+from .user import Users
+from .friends import Friends, FriendRequests
+from .statics import Goals, Illness

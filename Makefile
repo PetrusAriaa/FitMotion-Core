@@ -6,8 +6,8 @@ dev:
 	@echo "Backend is running in port :$(PORT)"
 	@echo "Access: http://$(DEV_HOST):$(PORT)/docs"
 	@echo "Access: http://localhost:$(PORT)/docs"
-	uvicorn src.main:app --port $(PORT) --reload
+	@uvicorn src.main:app --port $(PORT) --reload
 
 prod:
-	export SERVER_ENV=production && \
-	uvicorn src.main:app --host 0.0.0.0 --port $(PORT)
+	@export SERVER_ENV=production
+	@uvicorn src.main:app --host $(PROD_HOST) --port $(PORT)

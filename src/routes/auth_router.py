@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from typing import Union, Annotated
+from typing import Any, Union, Annotated
 from os import getenv
 import bcrypt
 from jose import jwt, JWTError
@@ -8,7 +8,7 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
 from ..dto import TokenResponseModel
-from ..model import UserModel
+from ..model import Users
 from ..db import get_db
 
 auth_router = APIRouter(tags=['Authentication'])
@@ -46,7 +46,7 @@ def validate_token(token: Annotated[str, Depends(oauth2_token_scheme)]):
 
 @auth_router.post("/login", response_model=TokenResponseModel, status_code=status.HTTP_200_OK)
 def local_login(auth_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: Session=Depends(get_db))  -> TokenResponseModel:
-    user = db.query(UserModel).filter(UserModel.username==auth_data.username).first()
+    user = db.query(Users).filter(Users.username==auth_data.username).first()
     if user is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="User not found",

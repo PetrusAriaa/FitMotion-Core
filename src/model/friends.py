@@ -1,19 +1,24 @@
 import uuid
-from sqlalchemy import DateTime, String
+from sqlalchemy import DateTime, text
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
-from sqlalchemy.dialects.postgresql import UUID, DATE
+from sqlalchemy.dialects.postgresql import UUID, DATE, SMALLINT
 from sqlalchemy.dialects.postgresql.pg_catalog import func
 
 class BaseModel(DeclarativeBase):
     pass
 
-class FriendsModel(BaseModel):
+class Friends(BaseModel):
     __tablename__ = 'friends'
     
-    id: Mapped[str] = mapped_column(UUID(as_uuid=True), primary_key=True, unique=True, server_default=str(uuid.uuid4()))
-    fk_user_id: Mapped[str] = mapped_column(UUID(as_uuid=True))
-    fk_friend_id: Mapped[str] = mapped_column(UUID(as_uuid=True))
-    created_at: Mapped[DateTime] = mapped_column(DATE, server_default=func.now())
-    updated_at: Mapped[DateTime] = mapped_column(DATE, nullable=True)
-    is_deleted: Mapped[bool] = mapped_column(nullable=True)
-    prev_id: Mapped[str] = mapped_column(UUID(as_uuid=True), nullable=True)
+    id: Mapped[int] = mapped_column(SMALLINT, primary_key=True, unique=True, server_default=text("nextval('friends_id_seq'::regclass)"))
+    fk_user_id: Mapped[str] = mapped_column(UUID(as_uuid=True), nullable=False)
+    friend_id: Mapped[str] = mapped_column(UUID(as_uuid=True), nullable=False)
+    created_at: Mapped[DateTime] = mapped_column(DATE, nullable=False)
+
+class FriendRequests(BaseModel):
+    __tablename__ = 'friend_requests'
+    
+    id: Mapped[str] = mapped_column(SMALLINT, primary_key=True, unique=True, server_default=text("nextval('friend_requests_id_seq'::regclass)"))
+    fk_user_id: Mapped[str] = mapped_column(UUID(as_uuid=True), nullable=False)
+    friend_id: Mapped[str] = mapped_column(UUID(as_uuid=True), nullable=False)
+    created_at: Mapped[DateTime] = mapped_column(DATE, nullable=False)
