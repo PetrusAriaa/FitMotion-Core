@@ -35,8 +35,10 @@ def get_user(username: str, db: Session=Depends(get_db)):
             data=user_list
         )
         return res
-    
-    users = db.query(Users).filter(Users.username.contains(username)).limit(10).all()
+    try:
+        users = db.query(Users).filter(Users.username.contains(username)).limit(10).all()
+    except:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="IDK BRO YO SERVER SUCKS")
     for user in users:
         _user = user.__dict__
         user_list.append(CommonUserModel(**_user))
