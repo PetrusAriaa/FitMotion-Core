@@ -13,6 +13,7 @@ sqlalchemy = "*"
 psycopg2-binary = "*"
 bcrypt = "*"
 python-jose = "*"
+google-cloud-storage = "*" 
 
 [dev-packages]
 
