@@ -13,7 +13,4 @@ engine = create_engine(getenv("PG_URL"), pool_size=100, pool_recycle=15)
 db = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 def get_db():
-    try:
-        yield db()
-    except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="IDK BRO YO SERVER SUCKS")
+    yield db()
