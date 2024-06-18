@@ -6,7 +6,7 @@ name = "pypi"
 [packages]
 fastapi = "*"
 python-multipart = "*"
-numpy = "*"
+numpy = "1.26.4"
 pandas = "*"
 onnxruntime = "*"
 sqlalchemy = "*"
