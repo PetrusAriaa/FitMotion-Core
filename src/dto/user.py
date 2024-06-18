@@ -1,4 +1,4 @@
-from typing import Iterable
+from typing import Iterable, Union
 from datetime import date
 import uuid
 from .response import BaseResponse
@@ -15,6 +15,13 @@ class CreateUserRequest(BaseModel):
     username: str
     email: str
     password: str
+
+class UserInfoRequest(BaseModel):
+    height: float
+    weight: float
+    birth: date
+    sex: str
+    goal: Union[str, None] = None
 
 class FriendRequestsModel(BaseModel):
     id: int

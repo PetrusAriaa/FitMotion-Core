@@ -1,4 +1,3 @@
-from datetime import datetime
 from sqlalchemy import DateTime, String, Boolean, Date, Float
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy.dialects.postgresql import UUID, TIMESTAMP
@@ -13,7 +12,7 @@ class Users(BaseModel):
     username: Mapped[str] = mapped_column(String, unique=True, nullable=False)
     email: Mapped[str] = mapped_column(String, unique=True, nullable=False)
     password: Mapped[str] = mapped_column(String(255), nullable=False)
-    created_at: Mapped[DateTime] = mapped_column(TIMESTAMP, nullable=False, default=datetime.now())
+    created_at: Mapped[DateTime] = mapped_column(TIMESTAMP, nullable=True)
     updated_at: Mapped[DateTime] = mapped_column(TIMESTAMP)
     is_deleted: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     last_login: Mapped[DateTime] = mapped_column(TIMESTAMP)
@@ -21,5 +20,6 @@ class Users(BaseModel):
     weight: Mapped[float] = mapped_column(Float)
     height: Mapped[float] = mapped_column(Float)
     birth: Mapped[DateTime] = mapped_column(Date)
+    sex: Mapped[str] = mapped_column(String(1))
     fk_goal: Mapped[str] = mapped_column(String(1))
     fk_illness: Mapped[str] = mapped_column(String(1))

@@ -19,7 +19,7 @@ async def upload_csv(file: UploadFile = File(...), session=Depends(validate_toke
 
     try:
         id = session['id']
-        blob = bucket.blob(f'{id}-{int(time_ns()/1000)}')
+        blob = bucket.blob(f'{id}-{int(time_ns()/1000)}.csv')
         blob.upload_from_file(file.file, content_type="text/csv")
         return {"message": f"File {file.filename} uploaded successfully."}
     except google_exceptions.GoogleAuthError as e:

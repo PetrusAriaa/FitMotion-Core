@@ -4,16 +4,14 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import JSONResponse
 from sqlalchemy import text
 
-from pydantic import BaseModel
-
 from .auth_router import validate_token
 from ..db import get_db
 from ..model import Users, Friends
 from ..dto import CommonUserModel, CreateUserRequest, CommonUserResponseModel,\
-    FriendRequestsModel, FriendRequestsResponseModel
+    FriendRequestsModel, FriendRequestsResponseModel, UserInfoRequest
 from sqlalchemy.orm import Session
 import bcrypt
-from datetime import date
+from datetime import datetime
 
 
 user_router = APIRouter(tags=['User'])
@@ -63,27 +61,46 @@ def create_user ( create_user_request: CreateUserRequest,
     user = db.query(Users).where(Users.email == create_user_request.email).first()
     if user is not None:
         raise HTTPException(400, detail="Email ini sudah terdaftar. Gunakan email lain.")
-    
-    
     try:
         create_user_model = Users(
             id=uuid4(),
             username = create_user_request.username,
             email = create_user_request.email,
-            password = _password
+            password = _password,
+            created_at = datetime.now()
         )
         db.add(create_user_model)
         db.commit()
         return JSONResponse({"message" : "success"})
-    except:
+    except Exception as e:
+        print(e)
         raise HTTPException(500, detail="Internal Server Error")
 
 
-# @user_router.patch("/", status_code=status.HTTP_202_ACCEPTED)
-# def edit_info()
+@user_router.patch("/", status_code=status.HTTP_202_ACCEPTED)
+def edit_info(base_info: UserInfoRequest,
+                session: Annotated[dict[str, Any], Depends(validate_token)],
+                db: Session = Depends(get_db)):
+    user_id = session['id']
+    try:
+        user = db.query(Users).where(Users.id == user_id).first()
+        if user is None:
+            raise HTTPException(404, detail="Username tidak ditemukan.")
+        user.height = base_info.height
+        user.weight = base_info.weight
+        user.birth = base_info.birth
+        user.sex = base_info.sex
+        user.fk_goal = base_info.goal
+        user.updated_at = datetime.now()
+        db.commit()
+        return JSONResponse({"message" : "success"})
+    except Exception as e:
+        print(e)
+        raise HTTPException(500, detail="Internal Server Error")
+
 
 @user_router.get("/requests")
-def get_friends_requests(session: Annotated[dict[str, Any], Depends(validate_token)],
+def get_friends_requests(session: Annotated[dict[str, ], Depends(validate_token)],
                         db: Session = Depends(get_db)):
     requests_list = []
     requests = db.execute(
@@ -107,5 +124,6 @@ def get_friends_requests(session: Annotated[dict[str, Any], Depends(validate_tok
 @user_router.get("/friends")
 def get_friends_list(session: Annotated[dict[str, Any], Depends(validate_token)],
                     db: Session = Depends(get_db)):
+    user_id = session['id']
     friends = db.query(Friends)
     pass
