@@ -116,7 +116,7 @@ def edit_info(base_info: UserInfoRequest,
         raise HTTPException(500, detail="Internal Server Error")
 
 
-@user_router.get("/requests")
+@user_router.get("/requests", response_model=FriendRequestsResponseModel)
 def get_friends_requests(session: Annotated[dict[str, ], Depends(validate_token)],
                         db: Session = Depends(get_db)):
     requests_list = []
@@ -138,7 +138,7 @@ def get_friends_requests(session: Annotated[dict[str, ], Depends(validate_token)
     return res
 
 
-@user_router.get("/friends")
+@user_router.get("/friends", response_model=FriendsResponseModel)
 def get_friends_list(session: Annotated[dict[str, Any], Depends(validate_token)],
                     db: Session = Depends(get_db)):
     user_id = session['id']

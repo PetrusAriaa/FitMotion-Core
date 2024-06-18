@@ -8,7 +8,7 @@ from ..model import Illness, Goals
 
 static_data_router = APIRouter(tags=['Utilities'])
 
-@static_data_router.get('/illness')
+@static_data_router.get('/illness', response_model=StaticIllnessResponseModel, deprecated=True)
 def get_illness_type(db: Session=Depends(get_db)):
     illness_list = []
     illness = db.query(Illness).all()
@@ -21,7 +21,7 @@ def get_illness_type(db: Session=Depends(get_db)):
     return res
 
 
-@static_data_router.get('/goal')
+@static_data_router.get('/goal', response_model=StaticGoalResponseModel)
 def get_goal_type(db: Session=Depends(get_db)):
     goals_list = []
     goals = db.query(Goals).all()
