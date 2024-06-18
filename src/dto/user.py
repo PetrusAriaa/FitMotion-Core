@@ -31,6 +31,9 @@ class FriendRequestsModel(BaseModel):
 class FriendRequestsResponseModel(BaseResponse):
     data: Iterable[FriendRequestsModel]
 
-class FriendListModel(BaseModel):
+class FriendsModel(BaseModel):
     id: int
     username: str
+
+class FriendsResponseModel(BaseResponse):
+    data: Iterable[FriendsModel]

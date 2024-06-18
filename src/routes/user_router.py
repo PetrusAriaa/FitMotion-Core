@@ -8,7 +8,8 @@ from .auth_router import validate_token
 from ..db import get_db
 from ..model import Users, Friends
 from ..dto import CommonUserModel, CreateUserRequest, CommonUserResponseModel,\
-    FriendRequestsModel, FriendRequestsResponseModel, UserInfoRequest
+    FriendRequestsModel, FriendRequestsResponseModel, UserInfoRequest, \
+    FriendsResponseModel, FriendsModel
 from sqlalchemy.orm import Session
 import bcrypt
 from datetime import datetime
@@ -77,11 +78,27 @@ def create_user ( create_user_request: CreateUserRequest,
         raise HTTPException(500, detail="Internal Server Error")
 
 
+def __validate_sex(sex_type: str):
+    try:
+        _ = ['F', 'M', 'm', 'F'].index(sex_type)
+    except ValueError:
+        raise HTTPException(400, detail="Sex must be one of 'F', 'M', 'm', 'f'.")
+
+
+def __validate_goal(goal_type: str):
+    try:
+        _ = ['A', 'B'].index(goal_type)
+    except ValueError:
+        raise HTTPException(400, detail="Goal must be either A or B.")
+
+
 @user_router.patch("/", status_code=status.HTTP_202_ACCEPTED)
 def edit_info(base_info: UserInfoRequest,
                 session: Annotated[dict[str, Any], Depends(validate_token)],
                 db: Session = Depends(get_db)):
     user_id = session['id']
+    __validate_sex(base_info.sex)
+    __validate_goal(base_info.goal)
     try:
         user = db.query(Users).where(Users.id == user_id).first()
         if user is None:
@@ -125,5 +142,20 @@ def get_friends_requests(session: Annotated[dict[str, ], Depends(validate_token)
 def get_friends_list(session: Annotated[dict[str, Any], Depends(validate_token)],
                     db: Session = Depends(get_db)):
     user_id = session['id']
-    friends = db.query(Friends)
-    pass
+    friends_list = []
+    friends = db.execute(
+        text(f"""
+            SELECT fr.id AS id,  u.username AS username, fr.created_at AS created_at FROM friends fr
+                JOIN users u ON u.id = fr.friend_id
+                WHERE fk_user_id='{str(user_id)}';
+        """)
+    )
+    for request in friends:
+        _request = request._asdict()
+        friends_list.append(FriendsModel(**_request))
+    
+    res = FriendsResponseModel(
+        code=status.HTTP_200_OK,
+        data=friends_list
+    )
+    return res
