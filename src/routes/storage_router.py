@@ -1,6 +1,4 @@
 import asyncio
-from time import time_ns
-import time
 from fastapi import Depends, File, UploadFile, HTTPException, APIRouter, BackgroundTasks
 from google.cloud import storage
 from google.auth import exceptions as google_exceptions
@@ -34,7 +32,7 @@ async def upload_csv(file: UploadFile = File(...), session=Depends(validate_toke
     if not file.filename.endswith(".csv"):
         raise HTTPException(status_code=400, detail="Only .csv files are allowed.")
     id = session['id']
-    filename = f'{id}-{int(time_ns()/1000)}.csv'
+    filename = f'{id}.csv'
     
     file_data = await file.read()
     asyncio.gather(processing(filename, file_data))
