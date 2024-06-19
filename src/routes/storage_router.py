@@ -9,7 +9,7 @@ from .auth_router import validate_token
 client = storage.Client()
 bucket_name = getenv("CLOUD_BUCKET")
 bucket = client.bucket(bucket_name)
-storage_router = APIRouter(tags=["Storage"])    
+storage_router = APIRouter(tags=["Storage"])
 
 
 @storage_router.post("/upload-csv/")
@@ -19,9 +19,9 @@ async def upload_csv(file: UploadFile = File(...), session=Depends(validate_toke
 
     try:
         id = session['id']
-        blob = bucket.blob(f'{id}-{int(time_ns()/1000)}.csv')
+        filename = f'{id}-{int(time_ns()/1000)}.csv'
+        blob = bucket.blob(filename)
         blob.upload_from_file(file.file, content_type="text/csv")
-        # return {"message": f"File {file.filename} uploaded successfully."}
         return {"status": True, "message": f"File {file.filename} uploaded successfully."}
     except google_exceptions.GoogleAuthError as e:
         raise HTTPException(status_code=500, detail="Authentication error with Google Cloud.") from e

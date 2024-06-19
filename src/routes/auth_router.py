@@ -1,5 +1,4 @@
-from datetime import datetime, timedelta
-from typing import Any, Union, Annotated
+from typing import Annotated
 from os import getenv
 import bcrypt
 from jose import jwt, JWTError
@@ -15,13 +14,8 @@ auth_router = APIRouter(tags=['Authentication'])
 
 oauth2_token_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
-def __generate_token(data: dict, expires_delta: Union[timedelta, None] = None):
+def __generate_token(data: dict) -> str:
     to_encode = data.copy()
-    # if expires_delta:
-    #     expire = datetime.now() + expires_delta
-    # else:
-    #     expire = datetime.now() + timedelta(minutes=15)
-    # to_encode.update({"exp": expire})
     token = jwt.encode(to_encode, getenv("SECRET"), getenv("ALGORITHM"))
     return token
 
@@ -60,9 +54,7 @@ def local_login(auth_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: 
 
     if not __validate_password(auth_data.password, user.password):
         raise HTTPException(status.HTTP_403_FORBIDDEN, detail="Wrong username or password", headers={'WWW-Authenticate':'Bearer'})
-    
-    token_expire = timedelta(minutes=float(getenv("TOKEN_TTL")))
-    token = __generate_token(data={"id": str(user.id)}, expires_delta=token_expire)
+    token = __generate_token(data={"id": str(user.id)})
     res = TokenResponseModel(
             access_token = token,
             token_type = "Bearer",
