@@ -80,9 +80,9 @@ def create_user ( create_user_request: CreateUserRequest,
 
 def __validate_sex(sex_type: str):
     try:
-        _ = ['F', 'M', 'm', 'F'].index(sex_type)
+        _ = ['F', 'M'].index(sex_type)
     except ValueError:
-        raise HTTPException(400, detail="Sex must be one of 'F', 'M', 'm', 'f'.")
+        raise HTTPException(400, detail="Sex must be one of 'F', 'M'.")
 
 
 def __validate_goal(goal_type: str):
