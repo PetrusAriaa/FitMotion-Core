@@ -142,6 +142,7 @@ def edit_info(base_info: UserInfoRequest,
         user.birth = base_info.birth
         user.sex = base_info.sex
         user.fk_goal = base_info.goal
+        user.fk_commitment = base_info.commitment
         user.updated_at = datetime.now()
         _bmi = calculate_bmi(user.weight, user.height / 100)
         user.bmi = _bmi
@@ -158,7 +159,8 @@ def edit_info(base_info: UserInfoRequest,
 @user_router.get("/screening", response_model=dict)
 def get_screening_data(session: Annotated[dict[str, Any], Depends(validate_token)], db: Session = Depends(get_db)):
     user_id = session['id']
-    user = db.execute(text(f"""select u.username, u.weight, u.height, u.sex, u.bmi, g."name" as goal from users u join goals g ON g.id = u.fk_goal where u.id='{user_id}'""")).first()
+    user = db.execute(text(f"""select u.username, u.weight, u.height, u.sex, u.bmi, g."name" as goal, c."name" as commitment from users u join goals g ON g.id = u.fk_goal 
+                            join commitment c on c.id = u.fk_commitment where u.id='{user_id}'""")).first()
     user._asdict()
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -172,9 +174,11 @@ def get_screening_data(session: Annotated[dict[str, Any], Depends(validate_token
         "Height" : user.height,
         "BMI": user.bmi,    
         "Category": bmi_category,
-        "Recommendation": recommendation
-    }
+        "Recommendation": recommendation,
+        "Commitment" : user.commitment
 
+
+    }
 
 @user_router.get("/requests", response_model=FriendRequestsResponseModel)
 def get_friends_requests(session: Annotated[dict[str, ], Depends(validate_token)],

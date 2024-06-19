@@ -22,6 +22,7 @@ class UserInfoRequest(BaseModel):
     birth: date
     sex: str
     goal: Union[str, None] = None
+    commitment: Union[str, None] = None
 
 class FriendRequestsModel(BaseModel):
     id: int
@@ -43,7 +44,8 @@ class UserInfoModel(BaseModel):
     weight: float
     height: float
     bmi: float
-    goal:str
+    goal: str
+    commitment: str
 
 class UserInfoResponseModel(BaseResponse):
     code: int
