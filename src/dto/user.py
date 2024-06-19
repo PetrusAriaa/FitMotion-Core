@@ -44,8 +44,10 @@ class UserInfoModel(BaseModel):
     weight: float
     height: float
     bmi: float
-    goal: str
-    commitment: str
+    goal: Union[str, None]
+    commitment: Union[str, None]
+    bmi_category: str
+    recommendation: str
 
 class UserInfoResponseModel(BaseResponse):
     code: int
