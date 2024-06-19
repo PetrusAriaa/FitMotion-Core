@@ -7,10 +7,10 @@ from pydantic import BaseModel
 
 from .auth_router import validate_token
 from ..db import get_db
-from ..model import Users, Friends
+from ..model import Users, Goals, Commitment
 from ..dto import CommonUserModel, CreateUserRequest, CommonUserResponseModel,\
     FriendRequestsModel, FriendRequestsResponseModel, UserInfoRequest, \
-    FriendsResponseModel, FriendsModel
+    FriendsResponseModel, FriendsModel, UserInfoModel, UserInfoResponseModel
 from sqlalchemy.orm import Session
 import bcrypt
 from datetime import datetime
@@ -156,29 +156,36 @@ def edit_info(base_info: UserInfoRequest,
         raise HTTPException(500, detail="Internal Server Error")
 
 
-@user_router.get("/screening", response_model=dict)
+@user_router.get("/detail")
 def get_screening_data(session: Annotated[dict[str, Any], Depends(validate_token)], db: Session = Depends(get_db)):
     user_id = session['id']
-    user = db.execute(text(f"""select u.username, u.weight, u.height, u.sex, u.bmi, g."name" as goal, c."name" as commitment from users u join goals g ON g.id = u.fk_goal 
-                            join commitment c on c.id = u.fk_commitment where u.id='{user_id}'""")).first()
-    user._asdict()
+    user = db.query(Users).where(Users.id == user_id).first()
+    # _user = UserInfoModel(**user.__dict__)
+    # user = db.execute(text(f"""select u.username, u.weight, u.height, u.sex, u.bmi, g."name" as goal, c."name" as commitment from users u join goals g ON g.id = u.fk_goal 
+    #                         join commitment c on c.id = u.fk_commitment where u.id='{user_id}'""")).first()
+    # user._asdict()
+    goal = db.query(Goals).where(Goals.id == user.fk_goal).first()
+    comm = db.query(Commitment).where(Commitment.id == user.fk_commitment).first()
+    
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-    
     bmi_category = categorize_bmi(user.bmi)
     recommendation = activity_recommendation(user.bmi, user.sex)
-    
-    return {
-        "Usernamme" : user.username,
-        "Weight" : user.weight,
-        "Height" : user.height,
-        "BMI": user.bmi,    
-        "Category": bmi_category,
-        "Recommendation": recommendation,
-        "Commitment" : user.commitment
-
-
-    }
+    _user = UserInfoModel(
+        username=user.username,
+        height=user.height,
+        weight=user.weight,
+        bmi=user.bmi,
+        commitment=comm.name,
+        goal=goal.name,
+        bmi_category=bmi_category,
+        recommendation=recommendation
+    )
+    res = UserInfoResponseModel(
+        code=status.HTTP_200_OK,
+        data=_user
+    )
+    return res
 
 @user_router.get("/requests", response_model=FriendRequestsResponseModel)
 def get_friends_requests(session: Annotated[dict[str, ], Depends(validate_token)],
