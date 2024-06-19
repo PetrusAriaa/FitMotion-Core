@@ -145,8 +145,8 @@ def edit_info(base_info: UserInfoRequest,
         user.updated_at = datetime.now()
         _bmi = calculate_bmi(user.weight, user.height / 100)  # convert cm to meters
         user.bmi = _bmi
-        bmi_category = categorize_bmi(_bmi)
-        recommendation = activity_recommendation(_bmi, user.sex)
+        # bmi_category = categorize_bmi(_bmi)
+        # recommendation = activity_recommendation(_bmi, user.sex)
         db.commit()
     
         return {"status" : "success"} 
@@ -155,6 +155,28 @@ def edit_info(base_info: UserInfoRequest,
     except Exception as e:
         print(e)
         raise HTTPException(500, detail="Internal Server Error")
+    
+# New endpoint to get screening data
+@user_router.get("/screening", response_model=dict)
+def get_screening_data(session: Annotated[dict[str, Any], Depends(validate_token)], db: Session = Depends(get_db)):
+    user_id = session['id']
+    user = db.execute(text(f"""select u.username, u.weight, u.height, u.sex, u.bmi, g."name" as goal from users u join goals g ON g.id = u.fk_goal where u.id='{user_id}'""")).first()
+    user._asdict()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # bmi = calculate_bmi(user.weight, user.height / 100)  # convert cm to meters
+    bmi_category = categorize_bmi(user.bmi)
+    recommendation = activity_recommendation(user.bmi, user.sex)
+    
+    return {
+        "Usernamme" : user.username,
+        "Weight" : user.weight,
+        "Height" : user.height,
+        "BMI": user.bmi,    
+        "Category": bmi_category,
+        "Recommendation": recommendation
+    }
     
 
 @user_router.get("/requests", response_model=FriendRequestsResponseModel)
