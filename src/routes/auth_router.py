@@ -46,7 +46,13 @@ def validate_token(token: Annotated[str, Depends(oauth2_token_scheme)]):
 
 @auth_router.post("/login", response_model=TokenResponseModel, status_code=status.HTTP_200_OK)
 def local_login(auth_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: Session=Depends(get_db))  -> TokenResponseModel:
-    user = db.query(Users).filter(Users.username==auth_data.username).first()
+    user = None
+    try:
+        _ = auth_data.username.index('@') != -1
+        user = db.query(Users).filter(Users.email==auth_data.username).first()
+    except ValueError:
+        user = db.query(Users).filter(Users.username==auth_data.username).first()
+    
     if user is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                             detail="User not found",
