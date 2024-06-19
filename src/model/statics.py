@@ -17,3 +17,9 @@ class Goals(BaseModel):
     id: Mapped[str] = mapped_column(VARCHAR(1), primary_key=True, unique=True)
     name: Mapped[str] = mapped_column(VARCHAR(32), nullable=False)
     description: Mapped[str] = mapped_column(TEXT, nullable=False)
+
+class Commitment(BaseModel):
+    __tablename__ = 'commitment'
+    
+    id: Mapped[str] = mapped_column(VARCHAR(1), primary_key=True, unique=True)
+    name: Mapped[str] = mapped_column(VARCHAR(32), nullable=False)

@@ -37,3 +37,14 @@ class FriendsModel(BaseModel):
 
 class FriendsResponseModel(BaseResponse):
     data: Iterable[FriendsModel]
+
+class UserInfoModel(BaseModel):
+    username : str
+    weight: float
+    height: float
+    bmi: float
+    goal:str
+
+class UserInfoResponseModel(BaseResponse):
+    code: int
+    data: UserInfoModel

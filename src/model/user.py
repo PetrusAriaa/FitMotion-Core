@@ -21,5 +21,6 @@ class Users(BaseModel):
     height: Mapped[float] = mapped_column(Float)
     birth: Mapped[DateTime] = mapped_column(Date)
     sex: Mapped[str] = mapped_column(String(1))
+    bmi: Mapped[float] = mapped_column(Float)
     fk_goal: Mapped[str] = mapped_column(String(1))
     fk_illness: Mapped[str] = mapped_column(String(1))

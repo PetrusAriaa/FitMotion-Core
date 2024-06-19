@@ -3,6 +3,7 @@ from uuid import uuid4
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import JSONResponse
 from sqlalchemy import text
+from pydantic import BaseModel
 
 from .auth_router import validate_token
 from ..db import get_db
@@ -16,6 +17,13 @@ from datetime import datetime
 
 
 user_router = APIRouter(tags=['User'])
+
+class UserProfile(BaseModel):
+    umur: int
+    berat_badan: float
+    tinggi_badan: float
+    gender: str
+    komitmen_menit_per_minggu: int
 
 
 def __generate_passw(password: str):
@@ -90,6 +98,32 @@ def __validate_goal(goal_type: str):
         _ = ['A', 'B'].index(goal_type)
     except ValueError:
         raise HTTPException(400, detail="Goal must be either A or B.")
+    
+
+#calculate function
+def calculate_bmi(berat_badan: float, tinggi_badan: float) -> float:
+    return berat_badan / (tinggi_badan ** 2)
+
+def categorize_bmi(bmi: float) -> str:
+    if bmi < 18.5:
+        return "Underweight"
+    elif 18.5 <= bmi <= 24.9:
+        return "Healthy Weight"
+    elif 25 <= bmi <= 29.9:
+        return "Overweight"
+    else:
+        return "Obesity"
+
+def activity_recommendation(bmi: float, gender: str) -> str:
+    if bmi > 25:
+        return ("Orang overweight lebih baik vigorous-intensity activity dikarenakan lebih efisien membakar kalori. "
+                "physical activity vigorous nya ke arah 150 menit/week (21 menit/day).")
+    else:
+        return ("Rekomendasi Orang Dewasa Normal (18 - 64): "
+                "Inactive = is not getting any moderate- or vigorous-intensity physical activity beyond basic movement from daily life activities. "
+                "Insufficiently Active = kurang dari 150menit/week of moderate-intensity physical activity atau 75menit/week of vigorous-intensity activity. "
+                "Active = equivalent of 150 minutes to 300 minutes of moderate-intensity physical activity a week; "
+                "Highly Active = is doing the equivalent of more than 300 minutes of moderate-intensity physical activity.")
 
 
 @user_router.patch("/", status_code=status.HTTP_202_ACCEPTED)
@@ -109,12 +143,41 @@ def edit_info(base_info: UserInfoRequest,
         user.sex = base_info.sex
         user.fk_goal = base_info.goal
         user.updated_at = datetime.now()
+        _bmi = calculate_bmi(user.weight, user.height / 100)  # convert cm to meters
+        user.bmi = _bmi
+        # bmi_category = categorize_bmi(_bmi)
+        # recommendation = activity_recommendation(_bmi, user.sex)
         db.commit()
-        return JSONResponse({"message" : "success"})
+    
+        return {"status" : "success"} 
+        
+    
     except Exception as e:
         print(e)
         raise HTTPException(500, detail="Internal Server Error")
-
+    
+# New endpoint to get screening data
+@user_router.get("/screening", response_model=dict)
+def get_screening_data(session: Annotated[dict[str, Any], Depends(validate_token)], db: Session = Depends(get_db)):
+    user_id = session['id']
+    user = db.execute(text(f"""select u.username, u.weight, u.height, u.sex, u.bmi, g."name" as goal from users u join goals g ON g.id = u.fk_goal where u.id='{user_id}'""")).first()
+    user._asdict()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # bmi = calculate_bmi(user.weight, user.height / 100)  # convert cm to meters
+    bmi_category = categorize_bmi(user.bmi)
+    recommendation = activity_recommendation(user.bmi, user.sex)
+    
+    return {
+        "Usernamme" : user.username,
+        "Weight" : user.weight,
+        "Height" : user.height,
+        "BMI": user.bmi,    
+        "Category": bmi_category,
+        "Recommendation": recommendation
+    }
+    
 
 @user_router.get("/requests", response_model=FriendRequestsResponseModel)
 def get_friends_requests(session: Annotated[dict[str, ], Depends(validate_token)],

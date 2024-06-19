@@ -57,3 +57,4 @@ def health_check(session: Annotated[dict[str, Any], Depends(validate_token)], db
         "Category": bmi_category,
         "Recommendation": recommendation
     }
+    
