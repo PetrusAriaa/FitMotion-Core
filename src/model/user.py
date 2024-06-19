@@ -24,3 +24,4 @@ class Users(BaseModel):
     bmi: Mapped[float] = mapped_column(Float)
     fk_goal: Mapped[str] = mapped_column(String(1))
     fk_illness: Mapped[str] = mapped_column(String(1))
+    # fk_commitment : Mapped[str] = mapped_column(String(1))
