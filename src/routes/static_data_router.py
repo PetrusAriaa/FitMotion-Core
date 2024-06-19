@@ -3,8 +3,8 @@ from sqlalchemy.orm import Session
 
 
 from ..db import get_db
-from ..dto import StaticGoalModel, StaticGoalResponseModel, StaticIllnessModel, StaticIllnessResponseModel
-from ..model import Illness, Goals
+from ..dto import StaticGoalModel, StaticGoalResponseModel, StaticIllnessModel, StaticIllnessResponseModel, StaticCommitmentModel, StaticCommitmentResponseModel
+from ..model import Illness, Goals, Commitment
 
 static_data_router = APIRouter(tags=['Utilities'])
 
@@ -28,6 +28,18 @@ def get_goal_type(db: Session=Depends(get_db)):
     for item in goals:
         goals_list.append(StaticGoalModel(**item.__dict__))
     res = StaticGoalResponseModel(
+        code=status.HTTP_200_OK,
+        data=goals_list
+    )
+    return res
+
+@static_data_router.get('/commitment', response_model=StaticCommitmentResponseModel)
+def get_goal_type(db: Session=Depends(get_db)):
+    goals_list = []
+    goals = db.query(Commitment).all()
+    for item in goals:
+        goals_list.append(StaticCommitmentModel(**item.__dict__))
+    res = StaticCommitmentResponseModel(
         code=status.HTTP_200_OK,
         data=goals_list
     )

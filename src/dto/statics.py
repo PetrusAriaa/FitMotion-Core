@@ -18,3 +18,11 @@ class StaticIllnessModel(BaseModel):
 class StaticIllnessResponseModel(BaseResponse):
     code: int
     data: Iterable[StaticIllnessModel]
+
+class StaticCommitmentModel(BaseModel):
+    id: str
+    name: str
+    
+class StaticCommitmentResponseModel(BaseResponse):
+    code: int
+    data: Iterable[StaticCommitmentModel]
