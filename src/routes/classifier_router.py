@@ -1,7 +1,7 @@
 from fastapi import APIRouter, UploadFile, status, HTTPException
 from ..tools import classify
 
-classifier_router = APIRouter(tags=['Motion classifier'])
+classifier_router = APIRouter(tags=['Motion classifier'], deprecated=True)
 
 async def __validate_file(file: UploadFile):
     if (file.content_type != 'text/csv'):

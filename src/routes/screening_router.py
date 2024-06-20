@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from typing import Annotated, Any
@@ -7,7 +7,7 @@ from ..model import Users
 from ..db import get_db
 from .auth_router import validate_token
 
-screening_router = APIRouter(tags=["Screening"]) 
+screening_router = APIRouter(tags=["Screening"], deprecated=True) 
 
 class UserProfile(BaseModel):
     umur: int
@@ -44,9 +44,10 @@ def activity_recommendation(bmi: float, gender: str) -> str:
 def health_check(session: Annotated[dict[str, Any], Depends(validate_token)], db: Session = Depends(get_db)):
     user_id = session['id']
     user = db.query(Users).filter(Users.id == user_id).first()
-    
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
+    if user.weight == None or user.height == None or user.sex == None:
+        raise HTTPException(status_code=status.HTTP_404_BAD_REQUEST, detail="User data does not exists. Fill weight, height, and sex first.")
 
     bmi = calculate_bmi(user.weight, user.height / 100)  # convert cm to meters
     bmi_category = categorize_bmi(bmi)

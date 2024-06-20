@@ -160,10 +160,9 @@ def edit_info(base_info: UserInfoRequest,
 def get_screening_data(session: Annotated[dict[str, Any], Depends(validate_token)], db: Session = Depends(get_db)):
     user_id = session['id']
     user = db.query(Users).where(Users.id == user_id).first()
-    # _user = UserInfoModel(**user.__dict__)
-    # user = db.execute(text(f"""select u.username, u.weight, u.height, u.sex, u.bmi, g."name" as goal, c."name" as commitment from users u join goals g ON g.id = u.fk_goal 
-    #                         join commitment c on c.id = u.fk_commitment where u.id='{user_id}'""")).first()
-    # user._asdict()
+    if user.weight == None or user.height == None or user.sex == None:
+        raise HTTPException(status_code=status.HTTP_404_BAD_REQUEST, detail="User data does not exists. Fill weight, height, and sex first.")
+
     goal = db.query(Goals).where(Goals.id == user.fk_goal).first()
     comm = db.query(Commitment).where(Commitment.id == user.fk_commitment).first()
     
