@@ -170,7 +170,7 @@ def get_screening_data(session: Annotated[dict[str, Any], Depends(validate_token
     user_id = session['id']
     user = db.query(Users).where(Users.id == user_id).first()
     if user.weight == None or user.height == None or user.sex == None:
-        raise HTTPException(status_code=status.HTTP_404_BAD_REQUEST, detail="User data does not exists. Fill weight, height, and sex first.")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="User data does not exists. Fill weight, height, and sex first.")
 
     goal = db.query(Goals).where(Goals.id == user.fk_goal).first()
     comm = db.query(Commitment).where(Commitment.id == user.fk_commitment).first()
