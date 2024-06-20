@@ -98,7 +98,14 @@ def __validate_goal(goal_type: str):
         _ = ['A', 'B'].index(goal_type)
     except ValueError:
         raise HTTPException(400, detail="Goal must be either A or B.")
-    
+
+
+def __validate_commitment(commitment_type: str):
+    try:
+        _ = ['A', 'B', 'C', 'D', 'E', 'F', 'G'].index(commitment_type)
+    except ValueError:
+        raise HTTPException(400, detail="Goal must be one of A to G.")
+
 
 #calculate function
 def calculate_bmi(berat_badan: float, tinggi_badan: float) -> float:
@@ -133,6 +140,8 @@ def edit_info(base_info: UserInfoRequest,
     user_id = session['id']
     __validate_sex(base_info.sex)
     __validate_goal(base_info.goal)
+    __validate_commitment(base_info.commitment)
+    
     try:
         user = db.query(Users).where(Users.id == user_id).first()
         if user is None:
